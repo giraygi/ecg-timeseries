@@ -4,14 +4,14 @@ This repo intends to build a platform independent pipeline for classifying the t
 
 ## Data Conversion
 
-ConvertTimeSeriesData:
+### ConvertTimeSeriesData:
 The java project ConvertTimeSeriesData includes several methods that may be used in combination to convert input data to the desired csv and json formats for data ingestion. In addition, the class includes a schema configuration generator (required by Pinot) and a data partition method to enable ingesting data in segments for performance. 
 
 The columns in the original data source are actually time points and patient attributes. This input needs to be transposed to yield a data source to represent the time points in a time series column. It is known that the whole sampling has been performed for 10 seconds with 1000 time points in each ECG. For this reason, the respective methods in ConvertTimeSeriesData generate the Time Series column (in alternative formats) by incrementing 10 milli seconds for the 1000 rows. The remaining dimensional columns are appended to this Time Series column via these conversion methods.     
 
 ## Development Environment (Notebook)
 
-JupyterLab:
+### JupyterLab:
 The jupyterlab directory includes a run.sh script that pulls a jupyterlab image, sets an application password "password123", clones the ecg notebook (https://github.com/spdrnl/ecg/blob/master/ECG.ipynb) into the notebooks directory of the container (alternative method is possible from git with GIT_URL parameter), installs pip requirements in requirements.txt and publishes the service on port 8889 . The port number has been changed for preventing collision with the druid service that is published on 8888
 
 The original docker image was retrieved from https://hub.docker.com/r/amalic/jupyterlab
