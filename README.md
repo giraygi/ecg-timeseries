@@ -12,7 +12,7 @@ The columns in the original data source are actually time points and patient att
 ## Development Environment (Notebook)
 
 ### JupyterLab:
-The jupyterlab directory includes a run.sh script that pulls a jupyterlab image, sets an application password "password123", clones the ecg notebook (https://github.com/spdrnl/ecg/blob/master/ECG.ipynb) into the notebooks directory of the container (alternative method is possible from git with GIT_URL parameter), installs pip requirements in requirements.txt and publishes the service on port 8889 . The port number has been changed for preventing collision with the druid service that is published on 8888
+The jupyterlab directory includes a run.sh script that pulls a jupyterlab image, sets an application password "password123", mounts the notebook directory of the container with ecg notebook (forked from https://github.com/spdrnl/ecg/blob/master/ECG.ipynb) into the notebooks  (alternative method is possible from git with GIT_URL parameter), installs pip requirements in requirements.txt and publishes the service on port 8889 . The port number has been changed for preventing collision with the druid service that is published on 8888
 
 The original docker image was retrieved from https://hub.docker.com/r/amalic/jupyterlab
 
