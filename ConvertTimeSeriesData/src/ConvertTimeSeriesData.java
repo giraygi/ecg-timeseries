@@ -267,6 +267,76 @@ public class ConvertTimeSeriesData {
 	
 	/**
 	 * 
+	 * This method takes an input csv file with a timeseries field on its leftmost column and 
+	 * divides it to the desired number of vertical partitions while repeating the timeseries column  in each partition.
+	 * 
+	 * */
+	
+	public static void verticalPartition (String inputFile,  int noofPartitions) {
+		try {
+			try {
+				FileReader fr = new FileReader(inputFile); 
+				BufferedReader br = new BufferedReader(fr);
+				List<String> timeSeries = new ArrayList<String>();
+				String line;
+				
+				while((line = br.readLine())!=null) {
+					timeSeries.add(line.split(",")[0]);
+				}
+				
+				List<FileWriter> fws = new ArrayList<FileWriter>();
+				
+				for(int i = 0;i<noofPartitions;i++) {
+					fws.add(new FileWriter(inputFile.replace(".", String.valueOf(i) +"." )));
+				}			
+				
+				br.close();		 
+				fr.close();
+				
+				FileReader fr2 = new FileReader(inputFile); 
+				BufferedReader br2 = new BufferedReader(fr2);
+				
+				int count = 0;
+				
+				while((line = br2.readLine())!=null) {
+					
+					for(int i = 0;i<noofPartitions;i++) {
+						fws.get(i).append(timeSeries.get(count));
+					}
+					
+					String[] dimensionColumns = Arrays.copyOfRange(line.split(","),1,line.split(",").length);
+					int partitionSize = (int) Math.ceil((double) dimensionColumns.length / noofPartitions);
+					
+					for (int j =0;j<dimensionColumns.length;j++) {
+						fws.get((int) Math.floor(j/partitionSize)).append(",").append(dimensionColumns[j]);
+					}
+					
+					for(int i = 0;i<noofPartitions;i++) {
+						fws.get(i).append("\n");
+					}
+					
+                    count++;
+				}
+				
+				br2.close();		 
+				fr2.close();
+				
+				for(int i = 0;i<noofPartitions;i++) {
+					fws.get(i).close();
+				}	
+				
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * 
 	 * This method converts an input 2D array that is ONLY composed of data points to a json file. with variables
 	 * Each row of the input 2D array is treated as a separate time point and a timestamp is given as the first variable of each record.
 	 * The remaining variables of each record are incrementing numbers that correspond to the columns of the input 2D array.
@@ -428,6 +498,9 @@ public class ConvertTimeSeriesData {
 		    break;
 		  case "partitionCSV":
 			  partitionCSV(args[1],Integer.parseInt(args[2]),Boolean.parseBoolean(args[3]));
+		    break;
+		  case "verticalPartitionCSV":
+			  verticalPartition(args[1],Integer.parseInt(args[2]));
 		    break;
 		  case "writeJSON":
 			  writeJSON(transpose2DoubleArray(loadCSV(args[1])), args[2]);

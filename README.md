@@ -5,7 +5,7 @@ This repo intends to build a platform independent pipeline for classifying the t
 ## Data Conversion
 
 ### ConvertTimeSeriesData:
-The java project ConvertTimeSeriesData includes several methods that may be used in combination to convert input data to the desired csv and json formats for data ingestion. In addition, the class includes a schema configuration generator (required by Pinot) and a data partition method to enable ingesting data in segments for performance. 
+The java project ConvertTimeSeriesData includes several methods that may be used in combination to convert input data to the desired csv and json formats for data ingestion. In addition, the class includes a schema configuration generator (required by Pinot) and a data partition method to enable ingesting data in vertical/horizontal segments/partitions for performance. The methods are documented in detail throughout the code in https://github.com/giraygi/ecg-timeseries/blob/main/ConvertTimeSeriesData/src/ConvertTimeSeriesData.java 
 
 The columns in the original data source are actually time points and patient attributes. This input needs to be transposed to yield a data source to represent the time points in a time series column. It is known that the whole sampling has been performed for 10 seconds with 1000 time points in each ECG. For this reason, the respective methods in ConvertTimeSeriesData generate the Time Series column (in alternative formats) by incrementing 10 milli seconds for the 1000 rows. The remaining dimensional columns are appended to this Time Series column via these conversion methods.     
 
@@ -19,7 +19,7 @@ The original docker image was retrieved from https://hub.docker.com/r/amalic/jup
 ## Time Series Databases and Data Import
 
 ### Pinot:
-The pinot_docker directory includes run.sh script that deploys a pinot service published on the 9000 port of localhost. The memory and memory-swap options of the container can be configured for better performance as seen in the second line of the script. schema.json (generated with ConvertTimeSeriesData) and table.json (OFFLINE) files in the directory are used to define a table and its respective schema by either swagger documentation or equivalent curl methods of the pinot service. Then the partitioned data (by ConvertTimeSeriesData methods) can be ingested piece by piece with the following command:
+The pinot_docker directory includes run.sh script that deploys a pinot service published on the 9000 port of localhost. The memory and memory-swap options of the container can be configured for better performance as seen in the second line of the script. schema.json (generated with ConvertTimeSeriesData) and table.json (OFFLINE) files in the directory are used to define a table and its respective schema by REST methods (/tables and /schemas using -d flag for schema.json and table.json content) of the pinot service through either swagger documentation or equivalent curl commands. Then the partitioned data (by ConvertTimeSeriesData methods) can be ingested piece by piece with the following command:
 
 curl -X POST -F file=@pinot1.csv -H "Content-Type: multipart/form-data" "http://localhost:9000/ingestFromFile?tableNameWithType=ecg_OFFLINE&batchConfigMapStr=%7B%22inputFormat%22%3A%22csv%22%2C%22recordReader.prop.delimiter%22%3A%22%2C%22%7D"
 
